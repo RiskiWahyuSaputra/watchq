@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-ink: #080808;
+  --color-ink-2: #101010;
+  --color-surface: #171717;
+  --color-fg: #f5f5f5;
+  --color-muted: #969696;
+  --color-silver: #c0c0c0;
+  --color-line: rgba(255, 255, 255, 0.12);
+
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-manrope), "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    background: var(--color-ink);
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    overflow-x: clip;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-silver);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 1px solid var(--color-silver);
+    outline-offset: 4px;
+  }
+
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+}
+
+/* ——— Typography helpers ——— */
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--color-silver);
+}
+@media (min-width: 640px) {
+  .eyebrow { font-size: 11px; }
+}
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(192, 192, 192, 0.22);
+}
+
+/* ——— Film grain (static, GPU-cheap) ——— */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  transform: translateZ(0);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ——— Hero ——— */
+.hero-spotlight {
+  background: radial-gradient(ellipse 45% 55% at 50% 30%, rgba(255, 255, 255, 0.07), transparent 70%);
+}
+.hero-vignette {
+  background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 45%, rgba(8, 8, 8, 0.85) 100%);
+}
+
+/* Pre-hydration states: avoid a flash before the intro timeline takes over. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .hero-hidden { opacity: 0; }
+  .js [data-hero-line].hero-hidden { opacity: 1; clip-path: inset(0 0 100% 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-intro-shade { display: none; }
+}
+html:not(.js) .hero-intro-shade { display: none; }
+
+.scroll-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-silver);
+  transform: translateY(-100%);
+  animation: scroll-line 2.4s cubic-bezier(0.76, 0, 0.24, 1) infinite;
+}
+@keyframes scroll-line {
+  0% { transform: translateY(-100%); }
+  50% { transform: translateY(0); }
+  100% { transform: translateY(100%); }
+}
+
+/* ——— Final reveal ——— */
+.final-spotlight {
+  background:
+    radial-gradient(ellipse 30% 55% at 58% -5%, rgba(255, 255, 255, 0.14), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 55% 55%, transparent 40%, rgba(8, 8, 8, 0.9) 100%);
+}
+.final-mask {
+  -webkit-mask-image: radial-gradient(ellipse 62% 72% at 54% 48%, #000 40%, transparent 92%);
+  mask-image: radial-gradient(ellipse 62% 72% at 54% 48%, #000 40%, transparent 92%);
+}
+
+/* ——— Hotspots ——— */
+.hotspot-pulse {
+  animation: hotspot-pulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+@keyframes hotspot-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ——— Image hover ——— */
+.img-hover {
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1), filter 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) {
+  *:hover > .img-hover,
+  .img-hover:hover {
+    transform: scale(1.035);
+    filter: brightness(1.08);
+  }
+}
+
+/* ——— Nav / footer links ——— */
+.nav-link::after,
+.footer-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.footer-link { position: relative; padding-bottom: 4px; }
+.nav-link:hover::after,
+.footer-link:hover::after,
+.nav-link[aria-current]::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ——— Custom cursor ——— */
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--color-fg);
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+  border: 1px solid rgba(245, 245, 245, 0.45);
+  transition: opacity 0.3s ease, scale 0.5s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.5s ease, border-color 0.5s ease;
+}
+.cursor-visible .cursor-dot,
+.cursor-visible .cursor-ring { opacity: 1; }
+.cursor-hover .cursor-ring {
+  scale: 1.8;
+  background-color: rgba(245, 245, 245, 0.08);
+  border-color: rgba(245, 245, 245, 0.8);
+}
+.cursor-hover .cursor-dot { opacity: 0; }
+.cursor-down .cursor-ring { scale: 0.8; }
+
+/* ——— Horizontal story: vertical stack when motion is reduced ——— */
+@media (prefers-reduced-motion: reduce) {
+  .h-track { flex-direction: column !important; width: 100% !important; height: auto !important; }
+  .h-panel { width: 100% !important; height: auto !important; padding-top: 4rem; padding-bottom: 4rem; }
+  .h-panel-media { height: 60vh !important; }
+}
+
+/* ——— Accessibility ——— */
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: -4rem;
+  z-index: 200;
+  padding: 0.75rem 1rem;
+  background: var(--color-fg);
+  color: var(--color-ink);
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  transition: top 0.3s ease;
+}
+.skip-link:focus { top: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
